@@ -2,20 +2,11 @@ package org.example.module12_2;
 
 import java.util.Arrays;
 
-public class FizzBuzz {
+public class FizzBuzzGame {
     int[] array;
     String[] resultArray;
-    boolean value = true;
-    int index = 0;
-    String[] start() {
-        fizz.start();
-        buzz.start();
-        fizzbuzz.start();
-        number.start();
-        value = false;
-        return resultArray;
-    }
-    public FizzBuzz(int length) {
+
+    public FizzBuzzGame(int length) {
         array = new int[length];
         resultArray = new String[length];
         for (int i = 0; i < array.length; i++) {
@@ -23,57 +14,88 @@ public class FizzBuzz {
         }
         System.out.println(Arrays.toString(array));
     }
-    Thread fizz = new Thread(() -> {
-        while (value) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if(array[index] % 3 == 0) {
-                resultArray[index] = "fizz";
-                index++;
-            }
-        }
-    });
-    Thread buzz = new Thread(() -> {
-        while (value) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
 
+    String[] launch() {
+        Thread fizzbuzz = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                for (int index = 0; index < array.length; index++) {
+                    if(array[index] % 3 == 0 && array[index] % 5 == 0) {
+                        resultArray[index] = "fizzbuzz";
+                    }
+                }
             }
-            if(array[index] % 5 == 0) {
-                resultArray[index] = "buzz";
-                index++;
-            }
-        }
-    });
-    Thread fizzbuzz = new Thread(() -> {
-        while (value) {
+        });
+        Thread fizz = new Thread(() -> {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
             }
-            if(array[index] % 3 == 0 && array[index] % 5 == 0) {
-                resultArray[index] = "fizzbuzz";
-                index++;
+            while (!Thread.currentThread().isInterrupted()) {
+                for (int index = 0; index < array.length; index++) {
+                    if(array[index] % 3 == 0 && resultArray[index] == null) {
+                        resultArray[index] = "fizz";
+                    }
+                }
+            }
+        });
+        Thread buzz = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                for (int index = 0; index < array.length; index++) {
+                    if(array[index] % 5 == 0 && resultArray[index] == null) {
+                        resultArray[index] = "buzz";
+                    }
+                }
+            }
+        });
+
+        Thread number = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                for (int index = 0; index < array.length; index++) {
+                    if(array[index] % 3 != 0 && array[index] % 5 != 0) {
+                        resultArray[index] = String.valueOf(array[index]);
+                    }
+                }
+            }
+        });
+
+        fizz.start();
+        buzz.start();
+        fizzbuzz.start();
+        number.start();
+
+        while (!Thread.currentThread().isInterrupted()) {
+            int count = 0;
+            for (String s : resultArray) {
+                if (s != null) {
+                    count++;
+                }
+            }
+            if (count == resultArray.length) {
+                break;
             }
         }
-    });
-    Thread number = new Thread(() -> {
-        while (value) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            if(array[index] % 3 != 0 && array[index] % 5 != 0) {
-                resultArray[index] = String.valueOf(array[index]);
-                index++;
-            }
-        }
-    });
+
+        fizz.interrupt();
+        buzz.interrupt();
+        fizzbuzz.interrupt();
+        number.interrupt();
+
+        return resultArray;
+    }
 }

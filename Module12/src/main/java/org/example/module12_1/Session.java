@@ -1,4 +1,4 @@
-package org.example;
+package org.example.module12_1;
 
 
 public class Session {
@@ -21,8 +21,7 @@ public class Session {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.print("Прошло 5 секунд, поточное время с начала роботы: ");
+            System.out.print("Прошло 5 секунд, время с начала роботы: ");
         }
     });
-
 }
