@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a9f8c04-c9e3-4316-87a6-fb3fa6198c33" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/module12_1/Session.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/module12_2/FizzBuzzGame.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/module12_2/Main.java" afterDir="false" />
-    </list>
+    <list default="true" id="9a9f8c04-c9e3-4316-87a6-fb3fa6198c33" name="Changes" comment="Module 12" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -90,11 +79,23 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1680345212259</updated>
-      <workItem from="1680345213377" duration="9606000" />
+      <workItem from="1680345213377" duration="10177000" />
     </task>
+    <task id="LOCAL-00001" summary="Module 12">
+      <created>1680356330709</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1680356330709</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Module 12" />
+    <option name="LAST_COMMIT_MESSAGE" value="Module 12" />
   </component>
 </project>
