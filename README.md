@@ -6,3 +6,7 @@
 #### [Модуль 12. Багатопоточність](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module12)  
 * [Завдання 1](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module12/src/main/java/org/example/module12_1)  
 * [Завдання 2](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module12/src/main/java/org/example/module12_2)  
+#### [Модуль 13. Web, протоколи](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module13)  
+* [Завдання 1](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module13/src/main/java/org/example/module13_1)
+* [Завдання 2](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module13/src/main/java/org/example/module13_2)
+* [Завдання 3](https://github.com/Gr1Lzy/GoItHomework/tree/main/Module13/src/main/java/org/example/module13_3)
