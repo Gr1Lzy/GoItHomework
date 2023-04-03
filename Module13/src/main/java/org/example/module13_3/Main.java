@@ -1,41 +1,36 @@
 package org.example.module13_3;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Main {
-    public static void main(String[] args) {
-        int userId = 1;
-        String apiUrl = "https://jsonplaceholder.typicode.com/users/" + userId + "/todos";
-        JSONArray tasks = new JSONArray(sendGet(apiUrl));
+    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
-        System.out.println("Open tasks:");
-        for (int i = 0; i < tasks.length(); i++) {
-            JSONObject task = tasks.getJSONObject(i);
-            if (!task.getBoolean("completed")) {
-                System.out.println(task.getString("title"));
-            }
-        }
+    public static void main(String[] args) throws Exception {
+        System.out.println(getOpenTodosForUser(1));
     }
 
-    private static String sendGet(String url) {
-        StringBuilder response = new StringBuilder();
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            Scanner scanner = new Scanner(connection.getInputStream());
-            while (scanner.hasNext()) {
-                response.append(scanner.nextLine());
+    public static String getOpenTodosForUser(int userId) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/users/" + userId + "/todos"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JSONArray jsonArray = new JSONArray(response.body());
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Open tasks for user ").append(userId).append(":\n");
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = jsonArray.getJSONObject(i);
+            if (!obj.getBoolean("completed")) {
+                stringBuilder.append(obj.getString("title")).append(" - false\n");
             }
-            scanner.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
-        return response.toString();
+        return stringBuilder.toString();
     }
 }
-

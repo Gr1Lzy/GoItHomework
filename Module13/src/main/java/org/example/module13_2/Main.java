@@ -1,53 +1,77 @@
 package org.example.module13_2;
 
+import com.google.gson.*;
+
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class Main {
+    private static final String URL_USERS =
+            "https://jsonplaceholder.typicode.com/users";
+    private static final String URL_POSTS =
+            "https://jsonplaceholder.typicode.com/posts";
 
-    public static void main(String[] args) {
-        int userId = 1;
-        String apiUrl = "https://jsonplaceholder.typicode.com/users/" + userId + "/posts";
-        JSONArray posts = new JSONArray(sendGet(apiUrl));
-        JSONObject lastPost = posts.getJSONObject(posts.length() - 1);
-        int postId = lastPost.getInt("id");
-
-        apiUrl = "https://jsonplaceholder.typicode.com/posts/" + postId + "/comments";
-        JSONArray comments = new JSONArray(sendGet(apiUrl));
-
-        for (int i = 0; i < comments.length(); i++) {
-            JSONObject comment = comments.getJSONObject(i);
-            System.out.println(comment.getString("name") + ": " + comment.getString("body"));
-        }
-
-        String fileName = "user-" + userId + "-post-" + postId + "-comments.json";
-        try (FileWriter file = new FileWriter(fileName)) {
-            file.write(comments.toString());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+    public static void main(String[] args) throws Exception {
+        System.out.println(getMaxIdPostByUserID(3));
+        fileWriteUserIDAndPostID(46, 10);
     }
 
-    private static String sendGet(String url) {
-        StringBuilder response = new StringBuilder();
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
+    public static String getMaxIdPostByUserID(int id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(URL_USERS + "/" + id + "/posts"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonParser jsonParser = new JsonParser();
+        JsonArray postsArray = jsonParser.parse(response.body()).getAsJsonArray();
 
-            Scanner scanner = new Scanner(connection.getInputStream());
-            while (scanner.hasNext()) {
-                response.append(scanner.nextLine());
+        int maxId = 0;
+        String bodyWithMaxID = "";
+
+        for (JsonElement postElement : postsArray) {
+            JsonObject postObject = postElement.getAsJsonObject();
+            int postId = postObject.get("id").getAsInt();
+            if (postId > maxId) {
+                maxId = postId;
+                bodyWithMaxID = postObject.get("body").getAsString();
             }
-            scanner.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
         }
-        return response.toString();
+        return bodyWithMaxID;
+    }
+
+    public static String fileWriteUserIDAndPostID(int userID, int postID) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(URL_POSTS + "/" + postID + "/comments"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonParser jsonParser = new JsonParser();
+        JsonArray idArray = jsonParser.parse(response.body()).getAsJsonArray();
+
+        String bodyWithID = "";
+        for (JsonElement idElement : idArray) {
+            JsonObject postObject = idElement.getAsJsonObject();
+            int postId = postObject.get("id").getAsInt();
+            if (postId == userID) {
+                bodyWithID = postObject.get("body").getAsString();
+            }
+        }
+
+        FileWriter file = new FileWriter("user-" + userID + "-post-" + postID + "-comments.json");
+        file.write(bodyWithID);
+        file.close();
+        return bodyWithID;
     }
 }

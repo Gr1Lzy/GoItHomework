@@ -1,156 +1,100 @@
 package org.example.module13_1;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class Main {
-    private static final String TEST_URL =
+    private static final String MAIN_URL =
             "https://jsonplaceholder.typicode.com/users";
 
-    public static void main(String[] args) throws IOException {
-        getAllUsers();
-        sendPOST();
-        update();
-        delete();
-        getAllUsers();
-        getUserById(3);
-        String username = "Antonette";
-        String url = String.format("%s?username=%s", TEST_URL, username);
-        getUserByUsername(url);
+    private static final String USER = "{"
+            + "\"name\": \"Andrey Kolomoets\","
+            + "\"username\": \"gr1lzy\","
+            + "\"email\": \"kolomoets@example.com\""
+            + "}";
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(getAllUsers(MAIN_URL)
+                + "\n-------------------------------------------------------");
+        System.out.println("User added: \n" + createUser()
+                + "\n-------------------------------------------------------");
+        System.out.println("User updated: \n" + updateUser(1)
+                + "\n-------------------------------------------------------");
+        System.out.println("DELETED code: " + deleteUser(1)
+                + "\n-------------------------------------------------------");
+        System.out.println("User by id: " + getUserByID(2)
+                + "\n-------------------------------------------------------");
+        System.out.println("User by username: " + getUserByUsername("Maxime_Nienow")
+                + "\n-------------------------------------------------------");
     }
 
-    private static void getAllUsers() throws IOException {
-        URL url = new URL(TEST_URL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
-        System.out.println("GET response code: " + responseCode);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in =
-                    new BufferedReader(
-                            new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-        } else {
-            System.out.println("GET request not worked");
-        }
+    public static String createUser() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(MAIN_URL))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(USER))
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 
-    private static void sendPOST() throws IOException {
-        URL url = new URL(TEST_URL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        OutputStream os = connection.getOutputStream();
-        os.write(Files.readAllBytes(new File("user.json").toPath()));
-        os.flush();
-        os.close();
-
-        int responseCode = connection.getResponseCode();
-        System.out.println("POST response code: " + responseCode);
-        if (responseCode == HttpURLConnection.HTTP_CREATED) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-        } else {
-            System.out.println("POST request not worked");
-        }
+    public static String updateUser(int id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(MAIN_URL + "/" + id))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(USER))
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 
-    private static void update() throws IOException {
-        URL url = new URL(TEST_URL + "/1");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("PUT");
-        connection.setDoOutput(true);
-        OutputStream os = connection.getOutputStream();
-        os.write(Files.readAllBytes(new File("userupdate.json").toPath()));
-        os.flush();
-        os.close();
+    public static int deleteUser(int id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(MAIN_URL + "/" + id))
+                .DELETE()
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        int responseCode = connection.getResponseCode();
-        System.out.println("PUT response code: " + responseCode);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-        } else {
-            System.out.println("PUT request not worked");
-        }
-    }
-    private static void delete() throws IOException {
-        URL url = new URL(TEST_URL + "/1");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("DELETE");
-
-        int responseCode = connection.getResponseCode();
-        System.out.println("DELETE response code: " + responseCode);
-        if (responseCode == 200) {
-            System.out.println("DELETE request worked");
-        } else {
-            System.out.println("DELETE request not worked");
-        }
+        return response.statusCode();
     }
 
-    private static void getUserById(int id) throws IOException {
-        URL url = new URL(TEST_URL + "/" + id);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-
-        int responseCode = connection.getResponseCode();
-        System.out.println("GET user by ID response code: " + responseCode);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuffer response = new StringBuffer();
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-        } else {
-            System.out.println("GET user by ID request not worked");
-        }
+    public static String getAllUsers(String uri) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 
-    private static void getUserByUsername(String url) throws IOException {
-        URL obj = new URL(url);
-        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
-        connection.setRequestMethod("GET");
-        int responseCode = connection.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-        } else {
-            System.out.println("GET request not worked");
-        }
+    public static String getUserByID(int id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(MAIN_URL + "/" + id))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    public static String getUserByUsername(String username) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(MAIN_URL + "?username=" + username))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 }
