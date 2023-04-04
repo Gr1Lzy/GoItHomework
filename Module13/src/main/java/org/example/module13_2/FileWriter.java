@@ -2,23 +2,17 @@ package org.example.module13_2;
 
 import com.google.gson.*;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class Main {
+public class FileWriter {
     private static final String USERS_URL =
             "https://jsonplaceholder.typicode.com/users";
     private static final String POSTS_URL =
             "https://jsonplaceholder.typicode.com/posts";
-
-    public static void main(String[] args) throws Exception {
-        int userID = 3;
-        writeCommentsToFile(userID, getLastPostIdByUserId(userID));
-    }
 
     public static int getLastPostIdByUserId(int userID) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
@@ -57,7 +51,7 @@ public class Main {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonString = gson.toJson(comments);
 
-        FileWriter file = new FileWriter("user-" + userID + "-post-" + postID + "-comments.json");
+        java.io.FileWriter file = new java.io.FileWriter("user-" + userID + "-post-" + postID + "-comments.json");
         file.write(jsonString);
         file.close();
     }

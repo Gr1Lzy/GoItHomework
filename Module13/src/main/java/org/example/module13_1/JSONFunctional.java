@@ -5,30 +5,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class Main {
-    private static final String MAIN_URL =
+public class JSONFunctional {
+    static final String MAIN_URL =
             "https://jsonplaceholder.typicode.com/users";
-
     private static final String USER = "{"
             + "\"name\": \"Andrey Kolomoets\","
             + "\"username\": \"gr1lzy\","
             + "\"email\": \"kolomoets@example.com\""
             + "}";
-
-    public static void main(String[] args) throws Exception {
-        System.out.println(getAllUsers(MAIN_URL)
-                + "\n-------------------------------------------------------");
-        System.out.println("User added: \n" + createUser()
-                + "\n-------------------------------------------------------");
-        System.out.println("User updated: \n" + updateUser(1)
-                + "\n-------------------------------------------------------");
-        System.out.println("DELETED code: " + deleteUser(1)
-                + "\n-------------------------------------------------------");
-        System.out.println("User by id: " + getUserByID(2)
-                + "\n-------------------------------------------------------");
-        System.out.println("User by username: " + getUserByUsername("Maxime_Nienow")
-                + "\n-------------------------------------------------------");
-    }
 
     public static String createUser() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
