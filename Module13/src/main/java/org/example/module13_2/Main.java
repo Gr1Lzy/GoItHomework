@@ -10,20 +10,20 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class Main {
-    private static final String URL_USERS =
+    private static final String USERS_URL =
             "https://jsonplaceholder.typicode.com/users";
-    private static final String URL_POSTS =
+    private static final String POSTS_URL =
             "https://jsonplaceholder.typicode.com/posts";
 
     public static void main(String[] args) throws Exception {
         int userID = 3;
-        fileWriteUserIDAndPostID(userID, getMaxIdPostByUserID(userID));
+        writeCommentsToFile(userID, getLastPostIdByUserId(userID));
     }
 
-    public static int getMaxIdPostByUserID(int id) throws Exception {
+    public static int getLastPostIdByUserId(int userID) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL_USERS + "/" + id + "/posts"))
+                .uri(URI.create(USERS_URL + "/" + userID + "/posts"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -32,37 +32,33 @@ public class Main {
         JsonParser jsonParser = new JsonParser();
         JsonArray postsArray = jsonParser.parse(response.body()).getAsJsonArray();
 
-        int maxId = 0;
+        int lastPostId = 0;
 
         for (JsonElement postElement : postsArray) {
             JsonObject postObject = postElement.getAsJsonObject();
             int postId = postObject.get("id").getAsInt();
-            if (postId > maxId) {
-                maxId = postId;
+            if (postId > lastPostId) {
+                lastPostId = postId;
             }
         }
-        return maxId;
+        return lastPostId;
     }
 
-    public static void fileWriteUserIDAndPostID(int userID, int postID) throws IOException, InterruptedException {
+    public static void writeCommentsToFile(int userID, int postID) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL_POSTS + "/" + postID + "/comments"))
+                .uri(URI.create(POSTS_URL + "/" + postID + "/comments"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JsonArray comments = JsonParser.parseString(response.body()).getAsJsonArray();
 
-        JsonArray jsonArray = new JsonArray();
-        jsonArray.add(comments);
-
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String jsonString = gson.toJson(jsonArray);
+        String jsonString = gson.toJson(comments);
 
         FileWriter file = new FileWriter("user-" + userID + "-post-" + postID + "-comments.json");
         file.write(jsonString);
         file.close();
     }
 }
-
