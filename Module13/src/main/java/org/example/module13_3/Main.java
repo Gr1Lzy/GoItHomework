@@ -4,11 +4,16 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Main {
-    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    private static final String BASE_URL = "https://jsonplaceholder.typicode.com/users/";
 
     public static void main(String[] args) throws Exception {
         System.out.println(getOpenTodosForUser(1));
@@ -17,20 +22,20 @@ public class Main {
     public static String getOpenTodosForUser(int userId) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/users/" + userId + "/todos"))
+                .uri(URI.create("https://jsonplaceholder.typicode.com/users/" + userId + "/todos"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONArray jsonArray = new JSONArray(response.body());
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Open tasks for user ").append(userId).append(":\n");
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject obj = jsonArray.getJSONObject(i);
-            if (!obj.getBoolean("completed")) {
-                stringBuilder.append(obj.getString("title")).append(" - false\n");
+        JSONArray tasks = new JSONArray(response.body());
+        List<JSONObject> openTasks = new ArrayList<>();
+        for (int i = 0; i < tasks.length(); i++) {
+            JSONObject task = tasks.getJSONObject(i);
+            if (!task.getBoolean("completed")) {
+                openTasks.add(task);
             }
         }
-        return stringBuilder.toString();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(openTasks);
     }
 }
