@@ -48,30 +48,32 @@ public class Main {
         return bodyWithMaxID;
     }
 
-    public static String fileWriteUserIDAndPostID(int userID, int postID) throws Exception {
+    public static void fileWriteUserIDAndPostID(int userID, int postID) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(URL_POSTS + "/" + postID + "/comments"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
-        HttpResponse<String> response =
-                client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonParser jsonParser = new JsonParser();
-        JsonArray idArray = jsonParser.parse(response.body()).getAsJsonArray();
-
-        String bodyWithID = "";
-        for (JsonElement idElement : idArray) {
-            JsonObject postObject = idElement.getAsJsonObject();
-            int postId = postObject.get("id").getAsInt();
-            if (postId == userID) {
-                bodyWithID = postObject.get("body").getAsString();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonArray comments = JsonParser.parseString(response.body()).getAsJsonArray();
+        JsonObject jsonObject = null;
+        for (JsonElement comment : comments) {
+            JsonObject obj = comment.getAsJsonObject();
+            if (obj.get("id").getAsInt() == userID) {
+                jsonObject = obj;
+                break;
             }
         }
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(jsonObject);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonString = gson.toJson(jsonArray);
 
         FileWriter file = new FileWriter("user-" + userID + "-post-" + postID + "-comments.json");
-        file.write(bodyWithID);
+        file.write(jsonString);
         file.close();
-        return bodyWithID;
     }
 }
+
